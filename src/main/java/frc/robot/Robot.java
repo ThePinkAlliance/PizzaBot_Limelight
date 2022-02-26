@@ -21,12 +21,20 @@ public class Robot extends TimedRobot {
 
   private final MotorController m_leftMotor = new PWMSparkMax(0);
   private final MotorController m_rightMotor = new PWMSparkMax(1);
+  private final Limelight m_Limelight = new Limelight();
+  private Auto m_LimelightAuto;
 
   @Override
-  public void robotInit() {
-    // We need to invert one side of the drivetrain so that positive voltages
-    // result in both sides moving forward. Depending on how your robot's
-    // gearbox is constructed, you might have to invert the left side instead.
+  public void autonomousInit() {
+    m_LimelightAuto = new Auto(m_Limelight);
+
+  }
+
+  @Override
+  public void teleopInit() {
+    if (m_LimelightAuto != null) {
+      m_LimelightAuto.cancel();
+    }
     m_rightMotor.setInverted(true);
 
     m_myRobot = new DifferentialDrive(m_leftMotor, m_rightMotor);
@@ -35,7 +43,20 @@ public class Robot extends TimedRobot {
   }
 
   @Override
+  public void robotInit() {
+    // We need to invert one side of the drivetrain so that positive voltages
+    // result in both sides moving forward. Depending on how your robot's
+    // gearbox is constructed, you might have to invert the left side instead.
+  }
+
+  @Override
   public void teleopPeriodic() {
     m_myRobot.tankDrive(m_leftStick.getY(), m_rightStick.getY());
+  }
+
+
+  @Override
+  public void autonomousPeriodic() {
+    Limelight.getDistance();
   }
 }
